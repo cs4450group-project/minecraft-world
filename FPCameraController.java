@@ -25,18 +25,19 @@ public class FPCameraController {
         private double currTime = System.currentTimeMillis();
         private Chunk[] chunks;
         private int seed = (int)System.currentTimeMillis();
-        static final int NUM_CHUNKS = 1;
+        private int numChunks ;
         
-        public FPCameraController(float x, float y, float z) {
+        public FPCameraController(float x, float y, float z, int nC) {
             pos = new Vector3f(x,y,z);
             IPos = new Vector3f(x,y,z);
             IPos.x = 0.0f;
             IPos.y = 15.0f;
             IPos.z = 0.0f;
-            chunks = new Chunk[NUM_CHUNKS * NUM_CHUNKS];
+            numChunks = nC;
+            chunks = new Chunk[numChunks * numChunks];
             int k = 0;
-            for (int i = 0; i < NUM_CHUNKS; i++) {
-                for (int j = 0; j < NUM_CHUNKS; j++) {
+            for (int i = 0; i < numChunks; i++) {
+                for (int j = 0; j < numChunks; j++) {
                     chunks[k] = new Chunk(i * -60, 0, j * -60, seed);
                     k++;
                 }
@@ -140,12 +141,12 @@ public class FPCameraController {
         // by default. G and comma activate gravity, during which time the space
         // becomes a jump key, while G and period end gravity mode.
         public void gameLoop() {
-            FPCameraController camera = new FPCameraController(pos.x, pos.y, pos.z);
+            FPCameraController camera = new FPCameraController(pos.x, pos.y, pos.z, numChunks);
             float dx;
             float dy;
             float yawSensitivity = 0.09f;
             float pitchSensitivity = 0.09f;
-            float moveSpeed = 0.35f;
+            float moveSpeed = 0.35f * numChunks;
             boolean grav = false;
             boolean locked = false;
             double initVel = 0;
@@ -278,8 +279,8 @@ public class FPCameraController {
                 if (locked) {
                     if (camera.pos.x > 1) {
                         camera.pos.x = 1;
-                    } else if (camera.pos.x < (NUM_CHUNKS) * -60 + 1) {
-                        camera.pos.x = (NUM_CHUNKS) * -60 + 1;
+                    } else if (camera.pos.x < (numChunks) * -60 + 1) {
+                        camera.pos.x = (numChunks) * -60 + 1;
                     }
                     if (camera.pos.y > -30) {
                         camera.pos.y = -30;
@@ -288,8 +289,8 @@ public class FPCameraController {
                     }
                     if (camera.pos.z > 2) {
                         camera.pos.z = 2;
-                    } else if (camera.pos.z < (NUM_CHUNKS) * -60 + 2) {
-                        camera.pos.z = (NUM_CHUNKS) * -60 + 2;
+                    } else if (camera.pos.z < (numChunks) * -60 + 2) {
+                        camera.pos.z = (numChunks) * -60 + 2;
                     }
                 }
                 glLoadIdentity();

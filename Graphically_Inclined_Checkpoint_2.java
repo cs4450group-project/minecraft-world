@@ -19,6 +19,7 @@ import org.lwjgl.util.glu.GLU;
 public class Graphically_Inclined_Checkpoint_2 {
     private FPCameraController cam;
     private DisplayMode dMode;
+    static final int NUM_CHUNKS = 1;
     
     // method: createWindow
     // purpose: Creates a window of size 640x480 and titles it "Graphically_Inclined_Checkpoint_2".
@@ -62,7 +63,7 @@ public class Graphically_Inclined_Checkpoint_2 {
         try {
             createWindow();
             initGL();
-            cam = new FPCameraController(-29.0f, -26.0f, -28.0f);
+            cam = new FPCameraController(-30f * NUM_CHUNKS + 1f, -26.0f, -30f * NUM_CHUNKS + 2f, NUM_CHUNKS);
             cam.gameLoop();
         } catch(Exception e) {
             e.printStackTrace();
