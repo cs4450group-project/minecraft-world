@@ -27,7 +27,8 @@ import static org.lwjgl.opengl.GL15.*;
 public class Chunk {
     static final int CHUNK_SIZE = 30;
     static final int CUBE_LENGTH = 2;
-    static final int SEED = (int)(System.currentTimeMillis() * 1000);
+//    static final int SEED = (int)(System.currentTimeMillis() * 1000);
+    private int seed;
     private Block[][][] blocks;
     public int genX;
     public int genY;
@@ -36,7 +37,7 @@ public class Chunk {
     private int VBOColorHandle;
     private int VBOTextureHandle;
     private Texture texture;
-    private SimplexNoise sNoise = new SimplexNoise(120, 0.55, SEED);
+    private SimplexNoise sNoise;
     private Random r;
     static private ChunkType type = Chunk.ChunkType.ChunkType_Overworld;
     
@@ -55,7 +56,7 @@ public class Chunk {
         }
     }
     
-    public Chunk(int startX, int startY, int startZ) {
+    public Chunk(int startX, int startY, int startZ, int s) {
         try {
             texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("terrain.png"));
         } catch (Exception e) {
@@ -64,6 +65,8 @@ public class Chunk {
         genX = startX;
         genY = startY;
         genZ = startZ;
+        seed = s;
+        sNoise = new SimplexNoise(120, 0.5, seed);
         r = new Random();
         int height;
         blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
@@ -88,7 +91,7 @@ public class Chunk {
 //        }
         for (int x = -startX; x < -startX + CHUNK_SIZE; x++) {
             for (int z = -startZ; z < -startZ + CHUNK_SIZE; z++) {
-                height = (int) (((sNoise.getNoise((int)x, (int)z)) + 1) / 2 * 10) + 5;
+                height = (int) (((sNoise.getNoise((int)x + startX/2, (int)z + startZ/2)) + 1) / 2 * 10) + 5;
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     if (y == 0) {
                         blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Bedrock);
@@ -181,7 +184,7 @@ public class Chunk {
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE * 72);
         for (float x = -initX; x < -initX + CHUNK_SIZE; x++) {
             for (float z = -initZ; z < -initZ + CHUNK_SIZE; z++) {
-                height = (int) (((sNoise.getNoise((int)x, (int)z)) + 1) / 2 * 10) + 5;
+                height = (int) (((sNoise.getNoise((int)x + (int)initX/2, (int)z + (int)initZ/2)) + 1) / 2 * 10) + 5;
                 for (float y = 0; y <= height; y++) {
                     VertexPositionData.put(createCube((float)(initX + x * CUBE_LENGTH), (float)(initY + y * CUBE_LENGTH), (float)(initZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(blocks[(int) x + (int)initX][(int) y][(int) z + (int)initZ])));
@@ -602,6 +605,8 @@ public class Chunk {
         };
     }
     
+    // method: changeType
+    // purpose: Changes the chunk's type.
     public void changeType(int t) {
         switch (t) {
             case 0:

@@ -24,6 +24,7 @@ public class FPCameraController {
         private float pitch = 0.0f;
         private double currTime = System.currentTimeMillis();
         private Chunk[] chunks;
+        private int seed = (int)System.currentTimeMillis();
         static final int NUM_CHUNKS = 1;
         
         public FPCameraController(float x, float y, float z) {
@@ -36,7 +37,7 @@ public class FPCameraController {
             int k = 0;
             for (int i = 0; i < NUM_CHUNKS; i++) {
                 for (int j = 0; j < NUM_CHUNKS; j++) {
-                    chunks[k] = new Chunk(i * -60, 0, j * -60);
+                    chunks[k] = new Chunk(i * -60, 0, j * -60, seed);
                     k++;
                 }
             }
@@ -136,7 +137,8 @@ public class FPCameraController {
         // Pressing L and period simultaneously re-engages the lock. Off by 
         // default. Pressing Q and right shift simultaneously enables texture
         // transparency, while pressing Q disables texture transparency. Opaque
-        // by default.
+        // by default. G and comma activate gravity, during which time the space
+        // becomes a jump key, while G and period end gravity mode.
         public void gameLoop() {
             FPCameraController camera = new FPCameraController(pos.x, pos.y, pos.z);
             float dx;
@@ -274,20 +276,20 @@ public class FPCameraController {
                     }
                 }
                 if (locked) {
-                    if (camera.pos.x > (NUM_CHUNKS - 1) * 60 + 1) {
-                        camera.pos.x = (NUM_CHUNKS - 1) * 60 + 1;
-                    } else if (camera.pos.x < -59) {
-                        camera.pos.x = -59;
+                    if (camera.pos.x > 1) {
+                        camera.pos.x = 1;
+                    } else if (camera.pos.x < (NUM_CHUNKS) * -60 + 1) {
+                        camera.pos.x = (NUM_CHUNKS) * -60 + 1;
                     }
                     if (camera.pos.y > -30) {
                         camera.pos.y = -30;
                     } else if (camera.pos.y < -58) {
                         camera.pos.y = -58;
                     }
-                    if (camera.pos.z > (NUM_CHUNKS - 1) * 60 + 2) {
-                        camera.pos.z = (NUM_CHUNKS - 1) * 60 + 2;
-                    } else if (camera.pos.z < -58) {
-                        camera.pos.z = -58;
+                    if (camera.pos.z > 2) {
+                        camera.pos.z = 2;
+                    } else if (camera.pos.z < (NUM_CHUNKS) * -60 + 2) {
+                        camera.pos.z = (NUM_CHUNKS) * -60 + 2;
                     }
                 }
                 glLoadIdentity();
