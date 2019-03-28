@@ -29,12 +29,31 @@ public class Chunk {
     static final int CUBE_LENGTH = 2;
     static final int SEED = (int)(System.currentTimeMillis() * 1000);
     private Block[][][] blocks;
+    public int genX;
+    public int genY;
+    public int genZ;
     private int VBOVertexHandle;
     private int VBOColorHandle;
     private int VBOTextureHandle;
     private Texture texture;
-    private SimplexNoise sNoise = new SimplexNoise(100, 0.6, SEED);
+    private SimplexNoise sNoise = new SimplexNoise(120, 0.55, SEED);
     private Random r;
+    static private ChunkType type = Chunk.ChunkType.ChunkType_Overworld;
+    
+    public enum ChunkType {
+        ChunkType_Overworld(0),
+        ChunkType_Nether(1);
+        private int chunkID;
+        ChunkType(int i) {
+            chunkID = i;
+        }
+        public int getID() {
+            return chunkID;
+        }
+        public void setID(int i) {
+            chunkID = i;
+        }
+    }
     
     public Chunk(int startX, int startY, int startZ) {
         try {
@@ -42,6 +61,9 @@ public class Chunk {
         } catch (Exception e) {
             System.err.println("Error loading terrain: terrain.png not found");
         }
+        genX = startX;
+        genY = startY;
+        genZ = startZ;
         r = new Random();
         int height;
         blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
@@ -125,7 +147,7 @@ public class Chunk {
     // types except grass, which is given {0, 0, 0} for the purposes
     // of recognizing it in the createCubeVertexCol method.
     private float[] getCubeColor(Block block) {
-        if (block.getID() == 0) {
+        if (block.getID() == 0 && type.getID() == 0) {
             return new float[] {0, 0, 0};
         }
         return new float[] {1, 1, 1};
@@ -219,170 +241,339 @@ public class Chunk {
     // is the red one to the side with the text on it.
     public static float[] createTexCube(float x, float y, Block block) {
         float offset = 1/16f;
-        switch(block.getID()) {
+        switch(type.getID()) {
             case 0:
-                return new float[] {
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 0, y + offset * 1,
-                    x + offset * 0, y + offset * 0,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 4, y + offset * 0,
-                    x + offset * 4, y + offset * 1,
-                    x + offset * 3, y + offset * 1
-                };
+                switch(block.getID()) {
+                    case 0:
+                        return new float[] {
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 0, y + offset * 1,
+                            x + offset * 0, y + offset * 0,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 4, y + offset * 0,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 4, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 4, y + offset * 0,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 4, y + offset * 0,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 3, y + offset * 1
+                        };
+                    case 1:
+                        return new float[] {
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1
+                        };
+                    case 2:
+                        return new float[] {
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12,
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12,
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12,
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12,
+                            x + offset * 14, y + offset * 13,
+                            x + offset * 13, y + offset * 13,
+                            x + offset * 13, y + offset * 12,
+                            x + offset * 14, y + offset * 12
+                        };
+                    case 3:
+                        return new float[] {
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 3, y + offset * 0
+                        };
+                    case 4:
+                        return new float[] {
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 1, y + offset * 0,
+                            x + offset * 2, y + offset * 0
+                        };
+                    case 5:
+                        return new float[] {
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1
+                        };
+                }
             case 1:
-                return new float[] {
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 3, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1
-                };
-            case 2:
-                return new float[] {
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12,
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12,
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12,
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12,
-                    x + offset * 14, y + offset * 13,
-                    x + offset * 13, y + offset * 13,
-                    x + offset * 13, y + offset * 12,
-                    x + offset * 14, y + offset * 12
-                };
-            case 3:
-                return new float[] {
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0,
-                    x + offset * 3, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 3, y + offset * 0
-                };
-            case 4:
-                return new float[] {
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 1, y + offset * 0,
-                    x + offset * 2, y + offset * 0
-                };
-            case 5:
-                return new float[] {
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1,
-                    x + offset * 2, y + offset * 2,
-                    x + offset * 1, y + offset * 2,
-                    x + offset * 1, y + offset * 1,
-                    x + offset * 2, y + offset * 1
-                };
+                switch(block.getID()) {
+                    case 0:
+                        return new float[] {
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1,
+                            x + offset * 4, y + offset * 2,
+                            x + offset * 3, y + offset * 2,
+                            x + offset * 3, y + offset * 1,
+                            x + offset * 4, y + offset * 1
+                        };
+                    case 1:
+                        return new float[] {
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6,
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6,
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6,
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6,
+                            x + offset * 9, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 9, y + offset * 6
+                        };
+                    case 2:
+                        return new float[] {
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14,
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14,
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14,
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14,
+                            x + offset * 14, y + offset * 15,
+                            x + offset * 13, y + offset * 15,
+                            x + offset * 13, y + offset * 14,
+                            x + offset * 14, y + offset * 14
+                        };
+                    case 3:
+                        return new float[] {
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6,
+                            x + offset * 8, y + offset * 7,
+                            x + offset * 7, y + offset * 7,
+                            x + offset * 7, y + offset * 6,
+                            x + offset * 8, y + offset * 6
+                        };
+                    case 4:
+                        return new float[] {
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14,
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14,
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14,
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14,
+                            x + offset * 1, y + offset * 15,
+                            x + offset * 0, y + offset * 15,
+                            x + offset * 0, y + offset * 14,
+                            x + offset * 1, y + offset * 14
+                        };
+                    case 5:
+                        return new float[] {
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1,
+                            x + offset * 2, y + offset * 2,
+                            x + offset * 1, y + offset * 2,
+                            x + offset * 1, y + offset * 1,
+                            x + offset * 2, y + offset * 1
+                        };
+                }
         }
+        
         return new float[] {
             x + offset * 15, y + offset * 1,
             x + offset * 16, y + offset * 1,
@@ -409,5 +600,16 @@ public class Chunk {
             x + offset * 16, y + offset * 2,
             x + offset * 15, y + offset * 2
         };
+    }
+    
+    public void changeType(int t) {
+        switch (t) {
+            case 0:
+                type = Chunk.ChunkType.ChunkType_Overworld;
+                break;
+            case 1:
+                type = Chunk.ChunkType.ChunkType_Nether;
+                break;
+        }
     }
 }

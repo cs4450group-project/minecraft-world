@@ -22,6 +22,7 @@ public class FPCameraController {
         private Vector3f IPos = null;
         private float yaw = 0.0f;
         private float pitch = 0.0f;
+        private double currTime = System.currentTimeMillis();
         private Chunk[] chunks;
         static final int NUM_CHUNKS = 1;
         
@@ -143,7 +144,10 @@ public class FPCameraController {
             float yawSensitivity = 0.09f;
             float pitchSensitivity = 0.09f;
             float moveSpeed = 0.35f;
+            boolean grav = false;
             boolean locked = false;
+            double initVel = 0;
+            float prevYPos = 10;
             Mouse.setGrabbed(true);
             while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
                 dx = Mouse.getDX();
@@ -214,7 +218,7 @@ public class FPCameraController {
                 if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
                     camera.astarboard(moveSpeed);
                 }
-                if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) && !grav) {
                     camera.ascend(moveSpeed);
                 }
                 if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
@@ -230,14 +234,53 @@ public class FPCameraController {
                 } else if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
                     glDisable(GL_BLEND);
                 }
+                if (Keyboard.isKeyDown(Keyboard.KEY_0)) {
+                    glClearColor(0.5f, 0.6f, 1.0f, 0.0f);
+                    for (int i = 0; i < chunks.length; i++) {
+                        chunks[i].changeType(0);
+                        chunks[i].rebuildMesh(chunks[i].genX, chunks[i].genY, chunks[i].genZ);
+                    }
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
+                    glClearColor(0.4f, 0.1f, 0.15f, 0.0f);
+                    for (int i = 0; i < chunks.length; i++) {
+                        chunks[i].changeType(1);
+                        chunks[i].rebuildMesh(chunks[i].genX, chunks[i].genY, chunks[i].genZ);
+                    }
+                }
+                if (Keyboard.isKeyDown(Keyboard.KEY_G) && Keyboard.isKeyDown(Keyboard.KEY_COMMA)) {
+                    currTime = (System.currentTimeMillis());
+                    initVel = prevYPos - camera.pos.y;
+                    grav = true;
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_G) && Keyboard.isKeyDown(Keyboard.KEY_PERIOD)) {
+                    grav = false;
+                }
+                if (grav) {
+                    double falling = initVel + 4.9d * (System.currentTimeMillis() - currTime) * (System.currentTimeMillis() - currTime) / 250000;
+                    camera.descend((float)falling);
+                    if (locked) {
+                        if (camera.pos.y > -30) {
+                            camera.pos.y = -30;
+                        } else if (camera.pos.y < -58) {
+                            camera.pos.y = -58;
+                        }
+                    }
+                    if (prevYPos == camera.pos.y) {
+                        initVel = 0;
+                        currTime = System.currentTimeMillis();
+                        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+                            camera.ascend(0.01f);
+                            initVel = -1;
+                        }
+                    }
+                }
                 if (locked) {
                     if (camera.pos.x > (NUM_CHUNKS - 1) * 60 + 1) {
                         camera.pos.x = (NUM_CHUNKS - 1) * 60 + 1;
                     } else if (camera.pos.x < -59) {
                         camera.pos.x = -59;
                     }
-                    if (camera.pos.y > 2) {
-                        camera.pos.y = 2;
+                    if (camera.pos.y > -30) {
+                        camera.pos.y = -30;
                     } else if (camera.pos.y < -58) {
                         camera.pos.y = -58;
                     }
@@ -253,7 +296,7 @@ public class FPCameraController {
                 for (int i = 0; i < chunks.length; i++) {
                     chunks[i].render();
                 }
-//                thirty.render();
+                prevYPos = camera.pos.y;
                 Display.update();
                 Display.sync(60);
             }
