@@ -27,7 +27,6 @@ import static org.lwjgl.opengl.GL15.*;
 public class Chunk {
     static final int CHUNK_SIZE = 30;
     static final int CUBE_LENGTH = 2;
-//    static final int SEED = (int)(System.currentTimeMillis() * 1000);
     private int seed;
     private Block[][][] blocks;
     public int genX;

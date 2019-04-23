@@ -15,11 +15,16 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.BufferUtils;
+import java.nio.FloatBuffer;
 
 public class Graphically_Inclined_Checkpoint_2 {
     private FPCameraController cam;
     private DisplayMode dMode;
     static final int NUM_CHUNKS = 1;
+    private FloatBuffer lightPosition;
+    private FloatBuffer whiteLight;
+    private FloatBuffer darkLight;
     
     // method: createWindow
     // purpose: Creates a window of size 640x480 and titles it "Graphically_Inclined_Checkpoint_2".
@@ -33,13 +38,17 @@ public class Graphically_Inclined_Checkpoint_2 {
             }
         }
         Display.setDisplayMode(dMode);
-        Display.setTitle("Graphically_Inclined_Checkpoint_2");
+        Display.setTitle("Graphically_Inclined_Final_Checkpoint");
         Display.create();
     }
     
     // method: initGL
-    // purpose: Colors window black and initializes coordinate system.
-    // Enables texture transparency.
+    // purpose: Colors window black and initializes coordinate system. Specifies
+    // lighting material color details. Enables texture transparency. Note that 
+    // lightPosition is also used in place of whiteLight at the ambient lighting
+    // setting; this is to allow realistic front and back ambient and diffuse
+    // lighting. (Basically, the grass stopped being green unless I added the
+    // extra code, so in it goes, I suppose!)
     private void initGL() {
         glClearColor(0.5f, 0.6f, 1.0f, 0.0f);
         glMatrixMode(GL_PROJECTION);
@@ -51,10 +60,29 @@ public class Graphically_Inclined_Checkpoint_2 {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_CULL_FACE);
-//        glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        initLightArrays();
+        glLight(GL_LIGHT0, GL_POSITION, lightPosition);
+        glLight(GL_LIGHT0, GL_SPECULAR, whiteLight);
+        glLight(GL_LIGHT0, GL_DIFFUSE, whiteLight);
+        glLight(GL_LIGHT0, GL_AMBIENT, darkLight);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+        glEnable(GL_COLOR_MATERIAL);
+    }
+    
+    // method: initLightArrays
+    // purpose: Initializes the arrays used in lighting specification.
+    private void initLightArrays() {
+        lightPosition = BufferUtils.createFloatBuffer(4);
+        lightPosition.put(0).put(0).put(0).put(1.0f).flip();
+        whiteLight = BufferUtils.createFloatBuffer(4);
+        whiteLight.put(1.0f).put(1.0f).put(1.0f).put(0.0f).flip();
+        darkLight = BufferUtils.createFloatBuffer(4);
+        darkLight.put(0.0f).put(0.0f).put(0.0f).put(1.0f).flip();
     }
     
     // method: start

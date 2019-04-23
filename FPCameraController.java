@@ -11,11 +11,13 @@
 *
 ****************************************************************/ 
 package graphically_inclined_checkpoint_2;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.util.vector.Vector3f;
+import java.nio.FloatBuffer;
 
 public class FPCameraController {
         private Vector3f pos = null;
@@ -30,9 +32,9 @@ public class FPCameraController {
         public FPCameraController(float x, float y, float z, int nC) {
             pos = new Vector3f(x,y,z);
             IPos = new Vector3f(x,y,z);
-            IPos.x = 0.0f;
-            IPos.y = 15.0f;
-            IPos.z = 0.0f;
+            IPos.x = -x;
+            IPos.y = -y + 8;
+            IPos.z = -z;
             numChunks = nC;
             chunks = new Chunk[numChunks * numChunks];
             int k = 0;
@@ -70,6 +72,9 @@ public class FPCameraController {
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw));
             pos.x -= xOffset;
             pos.z += zOffset;
+            FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+            lightPosition.put(IPos.x).put(IPos.y).put(IPos.z).put(1.0f).flip();
+            glLight(GL_LIGHT0, GL_POSITION, lightPosition);
         }
         
         // method: astern
@@ -80,6 +85,9 @@ public class FPCameraController {
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw));
             pos.x += xOffset;
             pos.z -= zOffset;
+            FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+            lightPosition.put(IPos.x).put(IPos.y).put(IPos.z).put(1.0f).flip();
+            glLight(GL_LIGHT0, GL_POSITION, lightPosition);
         }
         
         // method: aport
@@ -90,6 +98,9 @@ public class FPCameraController {
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw - 90));
             pos.x -= xOffset;
             pos.z += zOffset;
+            FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+            lightPosition.put(IPos.x).put(IPos.y).put(IPos.z).put(1.0f).flip();
+            glLight(GL_LIGHT0, GL_POSITION, lightPosition);
         }
         
         // method: astarboard
@@ -100,6 +111,9 @@ public class FPCameraController {
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw + 90));
             pos.x -= xOffset;
             pos.z += zOffset;
+            FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+            lightPosition.put(IPos.x).put(IPos.y).put(IPos.z).put(1.0f).flip();
+            glLight(GL_LIGHT0, GL_POSITION, lightPosition);
         }
         
         // method: ascend
@@ -121,6 +135,9 @@ public class FPCameraController {
             glRotatef(pitch, 1.0f, 0.0f, 0.0f);
             glRotatef(yaw, 0.0f, 1.0f, 0.0f);
             glTranslatef(pos.x, pos.y, pos.z);
+            FloatBuffer lightPosition = BufferUtils.createFloatBuffer(4);
+            lightPosition.put(IPos.x).put(IPos.y).put(IPos.z).put(1.0f).flip();
+            glLight(GL_LIGHT0, GL_POSITION, lightPosition);
         }
         
         // method: gameLoop
@@ -139,7 +156,8 @@ public class FPCameraController {
         // default. Pressing Q and right shift simultaneously enables texture
         // transparency, while pressing Q disables texture transparency. Opaque
         // by default. G and comma activate gravity, during which time the space
-        // becomes a jump key, while G and period end gravity mode.
+        // becomes a jump key, while G and period end gravity mode. 1 loads
+        // nether textures, 0 loads overworld textures.
         public void gameLoop() {
             FPCameraController camera = new FPCameraController(pos.x, pos.y, pos.z, numChunks);
             float dx;
