@@ -4,7 +4,7 @@
 * class: CS 4450: Computer Graphics
 *
 * assignment: Final Project
-* date last modified: 3/27/2019
+* date last modified: 4/22/2019
 *
 * purpose: Is the chunk. Contains render data, invokes simplex
 * noise and other methods for realistic terrain generation. 
@@ -14,7 +14,7 @@
 * the chunk.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_2;
+package graphically_inclined_checkpoint_3;
 import java.nio.FloatBuffer;
 import java.util.Random;
 import org.newdawn.slick.opengl.Texture;
@@ -69,25 +69,6 @@ public class Chunk {
         r = new Random();
         int height;
         blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-//        for (int x = 0; x < CHUNK_SIZE; x++) {
-//            for (int y = 0; y < CHUNK_SIZE; y++) {
-//                for (int z = 0; z < CHUNK_SIZE; z++) {
-//                    if(r.nextFloat() > 0.8f) {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
-//                    } else if (r.nextFloat() > 0.65f) {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
-//                    } else if (r.nextFloat() > 0.5f) {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
-//                    } else if (r.nextFloat() > 0.35f) {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
-//                    } else if (r.nextFloat() > 0.2f) {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
-//                    } else {
-//                        blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
-//                    }
-//                }
-//            }
-//        }
         for (int x = -startX; x < -startX + CHUNK_SIZE; x++) {
             for (int z = -startZ; z < -startZ + CHUNK_SIZE; z++) {
                 height = (int) (((sNoise.getNoise((int)x + startX/2, (int)z + startZ/2)) + 1) / 2 * 10) + 5;
@@ -151,7 +132,7 @@ public class Chunk {
     private float[] getCubeColor(Block block) {
         if (block.getID() == 0 && type.getID() == 0) {
             return new float[] {0, 0, 0};
-        }
+        } 
         return new float[] {1, 1, 1};
     }
     

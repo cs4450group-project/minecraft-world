@@ -4,13 +4,13 @@
 * class: CS 4450: Computer Graphics
 *
 * assignment: Final Project
-* date last modified: 3/27/2019
+* date last modified: 4/22/2019
 *
 * purpose: This file contains the necessary code for camera movement 
 * and creates the chunk.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_2;
+package graphically_inclined_checkpoint_3;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -67,6 +67,7 @@ public class FPCameraController {
         
         // method: ahead
         // purpose: Moves camera in the direction it's currently looking at.
+        // Keeps light source position static.
         public void ahead(float dist) {
             float xOffset = dist*(float)Math.sin(Math.toRadians(yaw));
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw));
@@ -79,7 +80,7 @@ public class FPCameraController {
         
         // method: astern
         // purpose: Moves camera in reverse of the direction it's currently 
-        // looking at.
+        // looking at. Keeps light source position static.
         public void astern(float dist) {
             float xOffset = dist*(float)Math.sin(Math.toRadians(yaw));
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw));
@@ -92,7 +93,7 @@ public class FPCameraController {
         
         // method: aport
         // purpose: Moves camera left with respect to the direction it's 
-        // currently looking at.
+        // currently looking at. Keeps light source position static.
         public void aport(float dist) {
             float xOffset = dist*(float)Math.sin(Math.toRadians(yaw - 90));
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw - 90));
@@ -105,7 +106,7 @@ public class FPCameraController {
         
         // method: astarboard
         // purpose: Moves camera right with respect to the direction it's 
-        // currently looking at.
+        // currently looking at. Keeps light source position static.
         public void astarboard(float dist) {
             float xOffset = dist*(float)Math.sin(Math.toRadians(yaw + 90));
             float zOffset = dist*(float)Math.cos(Math.toRadians(yaw + 90));

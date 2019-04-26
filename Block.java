@@ -9,7 +9,7 @@
 * purpose: Block object. Contains enumerated type for block types.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_2;
+package graphically_inclined_checkpoint_3;
 
 public class Block {
     private boolean isActive;
