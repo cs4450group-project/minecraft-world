@@ -10,7 +10,7 @@
 * and creates the chunk.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_3;
+package graphically_inclined_final_project;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;

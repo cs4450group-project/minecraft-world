@@ -10,7 +10,7 @@
 * tab. Tidied a bit to enhance readability.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_3;
+package graphically_inclined_final_project;
 import java.util.Random;
 
 public class SimplexNoise {

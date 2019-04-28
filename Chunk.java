@@ -4,17 +4,17 @@
 * class: CS 4450: Computer Graphics
 *
 * assignment: Final Project
-* date last modified: 4/22/2019
+* date last modified: 4/28/2019
 *
 * purpose: Is the chunk. Contains render data, invokes simplex
 * noise and other methods for realistic terrain generation. 
-* Constructor ensures that top layer is grass, water, or sand, the
-* first three below that are dirt, the layers below that are stone 
-* or dirt (favoring stone), and the bottom layer is bedrock. Renders
-* the chunk.
+* Constructor ensures that top layer is grass, water, or sand (based 
+* on height, and water is level), the first three below that are dirt, 
+* the layers below that are stone or dirt (favoring stone), and the 
+* bottom layer is bedrock. Renders the chunk.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_3;
+package graphically_inclined_final_project;
 import java.nio.FloatBuffer;
 import java.util.Random;
 import org.newdawn.slick.opengl.Texture;
@@ -65,7 +65,7 @@ public class Chunk {
         genY = startY;
         genZ = startZ;
         seed = s;
-        sNoise = new SimplexNoise(120, 0.5, seed);
+        sNoise = new SimplexNoise(120, 0.6, seed);
         r = new Random();
         int height;
         blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
@@ -84,13 +84,16 @@ public class Chunk {
                     } else if (y < height) {
                         blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Dirt);
                     } else {
-                        if (r.nextFloat() > 0.66) {
+                        if (height > 10) {
                             blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Grass);
-                        } else if (r.nextFloat() > 0.33) {
-                            blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Sand);
                         } else {
-                            blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Water);
+                            blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Sand);
                         }
+                    }
+                }
+                if (height < 11) {
+                    for (int y = height + 1; y < CHUNK_SIZE; y++) {
+                        blocks[x + startX][y][z + startZ] = new Block(Block.BlockType.BlockType_Water);
                     }
                 }
             }
@@ -169,6 +172,13 @@ public class Chunk {
                     VertexPositionData.put(createCube((float)(initX + x * CUBE_LENGTH), (float)(initY + y * CUBE_LENGTH), (float)(initZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(blocks[(int) x + (int)initX][(int) y][(int) z + (int)initZ])));
                     VertexTextureData.put(createTexCube((float) 0, (float) 0, blocks[(int) x + (int)initX][(int) y][(int) z + (int)initZ]));
+                }
+                if (height < 11) {
+                    for (float y = height; y < 11; y++) {
+                        VertexPositionData.put(createCube((float)(initX + x * CUBE_LENGTH), (float)(initY + y * CUBE_LENGTH), (float)(initZ + z * CUBE_LENGTH)));
+                        VertexColorData.put(createCubeVertexCol(getCubeColor(blocks[(int) x + (int)initX][(int) y][(int) z + (int)initZ])));
+                        VertexTextureData.put(createTexCube((float) 0, (float) 0, blocks[(int) x + (int)initX][(int) y][(int) z + (int)initZ]));
+                    }
                 }
             }
         }

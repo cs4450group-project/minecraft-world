@@ -10,7 +10,7 @@
 * libraries tab. Not altered aside from adding this header.
 *
 ****************************************************************/ 
-package graphically_inclined_checkpoint_3;
+package graphically_inclined_final_project;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
